@@ -1,0 +1,19 @@
+.section__gallery{
+    margin-top: 60px;
+}
+.gallery__box{
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -16px;
+    margin-top: -32px;
+}
+
+.gallery__card{
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.33;
+    margin-left: 16px;
+    margin-top: 32px;
+    width: calc(100% / 3 - 16px);
+    list-style: none;
+}

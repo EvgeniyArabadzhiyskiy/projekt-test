@@ -1,0 +1,33 @@
+
+.bacdrop{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(27, 27, 27, 0.548);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 600ms linear;
+    // overflow-y: scroll;
+}
+
+.modal__window{
+    width: 600px;
+    height: 450px;
+    padding: 40px 16px;
+    background-color: #fff;
+}
+
+.backdrop__is-hidden {
+    opacity: 1;
+    pointer-events: initial;
+  }
+
+
+.btnToggle{
+    margin-left: 800px;
+}  

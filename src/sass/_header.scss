@@ -1,0 +1,77 @@
+
+
+.logo__wrapper{
+    margin-left: 70px;
+    
+}
+.logo__text{
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.16;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.logo__image{
+    width: 24px;
+    display: inline-block;
+}
+
+.nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 45px;
+
+    
+}
+.nav__list{
+    display: flex;
+    
+    
+}
+
+.nav__item{
+    margin-left: 40px;
+    font-family: 'Roboto';
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.16;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.header{
+    max-width: 1024px;
+    height: 216px;
+    margin: 0 auto;
+    background-color: rgb(7, 186, 199);
+    background-image: url('../images/HomeHeader/hederHome1024.png');
+    
+
+}
+
+.search__input{
+    display:inline-block ;
+    width: 336px;
+    border: none;
+    outline: none;
+    margin-left: 300px;
+    margin-top: 50px;
+    background-color: transparent;
+    border-bottom: 3px solid rgb(48, 236, 11);
+}
+
+.search__input::placeholder{
+    color: #fff;
+}
+
+.search__btn{
+    color: rgb(32, 233, 14);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+// .search__icon{
+//     fill: rgb(16, 231, 8);
+// }
