@@ -1,154 +1,202 @@
+import axios from 'axios';
+// import "./addToStorage"
+import { addToWatch } from "./addToStorage";
+import defaultImage from '../images/defaulIMG.jpg'
+import {watchedArr} from './addToStorage'
+import { paginationPage } from "./pagination";
+
+
+// const defaultImage  = "https://image.tmdb.org/t/p/w500/pLAeWgqXbTeJ2gQtNvRmdIncYsk.jpg"
+
+const API_KEY = 'api_key=d8b0ad5d4fb786d62f1125fa68e28b99';
+const responseAxios = axios.create({
+  baseURL: 'https://api.themoviedb.org/3/',
+});
+
 const galleryBox = document.querySelector('.gallery__box');
 const btnPrev = document.querySelector('[data-action="prev"]');
 const btnNext = document.querySelector('[data-action="next"]');
 const btnCurrent = document.querySelector('[data-action="current"]');
 const searchForm = document.querySelector('.search__form');
-// const galleryCard = document.querySelector('.search__form');
+const pagContainer = document.querySelector('.pagination-container')
+
+
+export let searchInputValue = ''
+let movieDataCollection = []
+let allGanres = null
+
+
+responseAxios(`genre/movie/list?${API_KEY}&language=en-US`)
+.then(res => {
+  allGanres = res.data?.genres
+})
 
 
 
-function makeMarkupFilmCard({ imageSrc, title, movieGenres, movieYear, id }) {
-    return `
+function makeMarkupFilmCard({ imageSrc, title, genres, releaseYear, id }) {
+
+  return `
     <li  class="gallery__card" >
-      <img id=${id}  src=${imageSrc} alt=${title} data-modal="open">
+      <img id=${id}  src="${imageSrc}" alt="${title}" data-modal="open">
       <div class="title__wrapper">
           <h3 class="card__title">${title}</h3>
           <div class="wrapper__info">
-              <ul class="card__list">${movieGenres}</ul>
-              <p class="card__year"> | ${movieYear}</p>
+              
+            <p class="card__year"> | ${releaseYear}</p>
           </div>  
       </div>
     </li>`;
 }
 
+function makesMovieData({
+  poster_path,
+  title,
+  genre_ids,
+  release_date,
+  id,
+  popularity,
+  overview,
+  vote_average,
+  vote_count,
+}) {
 
-function makeDataMovie({ poster_path, title, genres, release_date, id }) {
   
-  const movieYear = release_date.slice(0, 4);
-
-  const filtredGanres = genres.slice();
-  filtredGanres.splice(2);
-
-  if (genres.length > 2) {
-    filtredGanres.push({ name: 'Others' });
+  if (release_date === "") {
+    release_date = "No release date";
   }
+  const releaseYear = release_date?.split("-").slice(0, 1) 
+  const imageSrc = poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : defaultImage;
+  
+  // console.log(genre_ids);
+  // const genresNames = genre_ids.reduce((acc, itemId, index) => {
+	// 	const genreName = allGanres.find(({id})  => id=== itemId)
+    
+	// 	return [...acc, genreName.name]
 
-  const movieGenres = filtredGanres.map(
-    genre => `<li class="card__genre">${genre.name} ${' '}</li>`
-  );
 
-  const imageSrc = `https://image.tmdb.org/t/p/w500${poster_path}`;
+	// },[])
+  // console.log("genresNames ~ genresNames", genresNames);
+
+  // // console.log(genresNames.length <= 2);
+  // if (genresNames.length <= 2) {
+  //   genresNames
+  // }
+
+  // if (genresNames.length > 2) {
+  //   genresNames.splice(2)
+    
+  // }
+
+  // if (genresNames.length > 2) {
+  //   // console.log("hello");
+  //   // genresNames.join(', ') + "Others"
+  // }
 
 
+  // ===================
+  // const genresNames = genres.reduce((acc, { name }, index) => {
+  //   if (!genres.length) {
+  //     return acc;
+  //   } 
+  //   else if (index <= 1) {
+  //     if (index <= genres.length - 2) {
+  //       return acc + name + ', ';
+  //     }
 
-  const dataMovie = {
+  //     return acc + name + ' ';
+  //   } 
+  //   else if (index === 2) {
+  //     return acc + 'Others';
+  //   }
+
+  //   return acc;
+  // },'');
+
+  // ===========================
+  
+
+  // console.log("genresNames ~ genresNames", genresNames);
+  
+// console.log(genre_ids);
+//  console.log(allGanres);
+
+  // const filtredGanres = genres.slice();
+  // filtredGanres.splice(2);
+
+  // if (genres.length > 2) {
+  //   filtredGanres.push({ name: 'Others' });
+  // }
+
+  // const movieGenres =
+  //   filtredGanres.length !== 0
+  //     ? filtredGanres.map(genre => `<li class="card__genre">${genre.name}</li>`)
+  //     : `<li class="card__genre">All</li>`;
+
+  return {
     id,
-    imageSrc,
-    movieGenres,
     title,
-    movieYear
-
-  }
-
-  return dataMovie
-
-
+    genre_ids,
+    imageSrc,
+    overview,
+    releaseYear,
+    popularity,
+    vote_count,
+    vote_average,
+  };
 }
 
-// const data = makeMarkupFilmCard
+
+export const popularFilms = (page = 1) => {
+  return responseAxios(`trending/movie/day?${API_KEY}&page=${page}`)
+  .then(res => res.data);
+};
+
+popularFilms().then(data => {
+  renderMovieCards(data.results) 
+  paginationPage(data) 
+                     
+})
 
 
-// ${genres.map(genre => {
-//     return `<p class="card__genre">${genre.name}</p>`
-// } ).join(' ')}
+export const searchFilms = (text, page = 1) => {
+  return  responseAxios(`search/movie?${API_KEY}&query=${text}&page=${page}`)
+    .then(res => res.data);
+};
 
-// function makeMarkupFilmCards(results) {
-//     return results.map(({poster_path}) => {
-//         const imageSrc = `https://image.tmdb.org/t/p/w500${poster_path}`
-//         return `<li class="gallery__items"><img  src=${imageSrc} alt="" width="200"></li>`
-//     }).join(' ')
 
-// }
-let page = 1;
-btnCurrent.textContent = 1;
 
-function createFIlmCardById(id) {
-  return fetch(
-    `https://api.themoviedb.org/3/movie/${id}?api_key=d8b0ad5d4fb786d62f1125fa68e28b99`
-  )
-    .then(res => res.json())
-    .then(data => {
-      // console.log('data', data);
+export  function renderMovieCards(results) {
+  movieDataCollection = []
 
-      if (!data.poster_path) {
-        return;
-      }
-      
-      const markupData = makeDataMovie(data);
+  const filmId = results.map(film => {
+    const movieData = makesMovieData(film)
+    const markup = makeMarkupFilmCard(movieData) 
+    galleryBox.insertAdjacentHTML('beforeend', markup);
 
-      const markup = makeMarkupFilmCard(markupData)
-
-      galleryBox.insertAdjacentHTML('beforeend', markup);
-    });
+    movieDataCollection.push(movieData);
+    
+  });
 }
 
-const popularFilms = page => {
-  fetch(
-    `https://api.themoviedb.org/3/trending/movie/day?api_key=d8b0ad5d4fb786d62f1125fa68e28b99&page=${page}`
-  )
-    .then(res => res.json())
-    .then(data => {
-      const filmId = data.results.map(film => film.id);
 
-      filmId.map(createFIlmCardById);
-    });
-};
-
-popularFilms(1);
-
-const searchFilms = (text, page) => {
-  fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=d8b0ad5d4fb786d62f1125fa68e28b99&query=${text}&page=${page}`
-  )
-    .then(res => res.json())
-    .then(data => {
-      const filmId = data.results.map(film => film.id);
-
-      filmId.map(createFIlmCardById);
-    });
-};
 
 searchForm.addEventListener('submit', onSearchFormSubmit);
 
 function onSearchFormSubmit(evt) {
   evt.preventDefault();
-  const searchInput = evt.target.elements.query;
+
+  searchInputValue = evt.target.elements.query.value;
 
   galleryBox.innerHTML = '';
-  searchFilms(searchInput.value);
+
+
+  searchFilms(searchInputValue, 1).then(data => {
+    renderMovieCards(data.results)
+    paginationPage(data)
+  })
 }
 
-btnNext.addEventListener('click', onBtnNextClick);
-btnPrev.addEventListener('click', onBtnPrevClick);
 
-function onBtnNextClick(params) {
-  galleryBox.innerHTML = '';
-
-  page += 1;
-  popularFilms(page);
-  btnCurrent.textContent = page;
-}
-
-function onBtnPrevClick(params) {
-  if (page === 1) {
-    return;
-  }
-
-  galleryBox.innerHTML = '';
-  page -= 1;
-  popularFilms(page);
-  btnCurrent.textContent = page;
-}
 
 export default popularFilms;
 
@@ -157,46 +205,121 @@ const backDrop = document.querySelector('.bacdrop');
 const modalWindow = document.querySelector('.modal__window');
 const btnCloseModal = document.querySelector('.modal__close');
 
-galleryBox.addEventListener('click', modalToggle);
-btnCloseModal.addEventListener('click', modalToggle);
+galleryBox.addEventListener('click', onOpenModal);
+btnCloseModal.addEventListener('click', closeBtnModal);
 backDrop.addEventListener('click', backdropCloseModal);
 
-function modalToggle(evt) {
+function modalToggle() {
+  backDrop.classList.toggle('backdrop__is-hidden');
+}
+
+function closeBtnModal() {
+  modalToggle();
+}
+
+function onOpenModal(evt) {
   if (evt.target.dataset.modal) {
-    backDrop.classList.toggle('backdrop__is-hidden');
+    modalToggle();
     makeModalCard(evt.target.id);
   }
+  
+
+  const btnWatched = document.querySelector('.add-watch')
+  
+  watchedArr.forEach(film => {
+    if (film.id === Number(btnWatched.dataset.id)) {
+      btnWatched.classList.add('passed')
+      btnWatched.textContent = "Remove"
+    }
+  })
+
+  
+  window.addEventListener('keydown', onPressEsc);
 }
 
 function backdropCloseModal(evt) {
   if (evt.target === evt.currentTarget) {
-    backDrop.classList.toggle('backdrop__is-hidden');
+    modalToggle();
   }
+}
+
+function onPressEsc(evt) {
+  if (evt.code === 'Escape') {
+    modalToggle();
+    window.removeEventListener('keydown', onPressEsc);
+  }
+}
+
+function createModalCard({
+  id,
+  title,
+  // genres,
+  overview,
+  popularity,
+  vote_count,
+  vote_average,
+  imageSrc,
+}) {
+  
+  return `
+  <li  class="modal-gallery__card" >
+    
+    <div class="modal-title__wrapper">
+
+        <img class="modal__image"  src=${imageSrc} alt=${title}  data-modal="open" width="320">
+
+        <div class="modal-wrapper__info">
+            <h3 class="modal__title">${title}</h3>
+
+          <div class="data__wrapper">
+              <div>
+              <p class="modal__info">Vote / Votes</p>
+              <p class="modal__info">Popularity</p>
+              <p class="modal__info">Original Title</p>
+              <p class="modal__info">Genre</p>
+              </div>
+
+              <div>
+              <p class="modal__data"> <span class="vote__data"> ${vote_average} </span> / ${vote_count}</p>
+              <p class="modal__data">${popularity}</p>
+              <p class="modal__data modal__data--upper">${title}</p>
+              <p class="modal__data">0</p>
+              </div> 
+          </div>
+
+            <p class="modal__about">About</p>
+            <p class="modal__about--text"> ${overview}</p>
+            <button class="add-watch" type="button" data-id="${id}">Add to Watched</button>
+        </div>  
+
+    </div>
+  </li>`;
 }
 
 
 
-function superFunction2(id) {
-    return fetch(
-      `https://api.themoviedb.org/3/movie/${id}?api_key=d8b0ad5d4fb786d62f1125fa68e28b99`
-    )
-      .then(res => res.json())
-      .then(data => {
-        // console.log('data', data);
+export let infoFilm = null
   
-        if (!data.poster_path) {
-          return;
-        }
-  
-        const markup = makeMarkupFilmCard(data);
-        
-  
-        modalWindow.innerHTML = markup
-      });
-  }
-
 function makeModalCard(id) {
-  if (id) {
-    superFunction2(id)
-  }
+  const filmDataById = movieDataCollection.filter(film =>  film.id === Number(id))
+  const info = filmDataById[0]
+
+  infoFilm = info
+ 
+  const markup = createModalCard(info);
+
+  modalWindow.innerHTML = markup;
+
+  addToWatch()
+
+
 }
+
+
+
+
+
+
+
+
+
