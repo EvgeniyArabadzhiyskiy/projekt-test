@@ -37,7 +37,7 @@ function makeMarkupFilmCard({ imageSrc, title, genres, releaseYear, id }) {
 
   return `
     <li  class="gallery__card" >
-      <img id=${id}  src="${imageSrc}" alt="${title}" data-modal="open">
+      <img class="gallery__image" id=${id}  src="${imageSrc}" alt="${title}" data-modal="open">
       <div class="title__wrapper">
           <h3 class="card__title">${title}</h3>
           <div class="wrapper__info">
